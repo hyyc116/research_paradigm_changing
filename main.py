@@ -30,14 +30,17 @@ def outstanding_papers(pathObj):
             if isfirst==0:
 
                 max_min = citnum
+                break
 
-        if max_min!=0 and citnum>max_min:
+    for pid in pid_citnum.keys():
+
+        if pid_citnum[pid]>=maxmin:
 
             highly_cited_pids.append(citnum)
 
 
     ##规定时间，并且画出分布
-    logging.info('paper year ...')
+    logging.info('maxmin:{},paper year ...'.format(citnum))
     pid_year = json.loads(open(pathObj._field_paper_year_path).read())
 
     logging.info("paper year citnum ...")
