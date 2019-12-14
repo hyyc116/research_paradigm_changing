@@ -34,7 +34,7 @@ def outstanding_papers(pathObj):
 
     for pid in pid_citnum.keys():
 
-        if pid_citnum[pid]>=maxmin:
+        if pid_citnum[pid]>=max_min:
 
             highly_cited_pids.append(citnum)
 
