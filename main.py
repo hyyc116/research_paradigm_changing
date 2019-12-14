@@ -60,7 +60,7 @@ def outstanding_papers(pathObj):
         total_in_5 = 0
         for year in sorted(year_citnum.keys(),key= lambda x:int(x)):
 
-            if int(year)- pub_year>5:
+            if int(year)- pub_year>3:
                 break
 
             total_in_5 += year_citnum[year]
