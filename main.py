@@ -99,11 +99,11 @@ def outstanding_papers(pathObj):
     #将这些ID的plot全画出来
     row = 14
 
-    fig,axes = plt.subplots(row,5,figsize=(5*2.5,row*2))
+    fig,axes = plt.subplots(row,10,figsize=(10*2.5,row*2))
 
-    for i,pid in enumerate(selected_ids[:70]):
+    for i,pid in enumerate(selected_ids[:140]):
 
-        ax = axes[i/5,i%5]
+        ax = axes[i/10,i%10]
 
         year_citnum = pid_year_citnum[pid]
 
@@ -123,7 +123,7 @@ def outstanding_papers(pathObj):
 
     plt.tight_layout()
 
-    plt.savefig('fig/cd_figure.png',dpi=400)
+    plt.savefig('fig/cd_figure.png',dpi=200)
 
     logging.info('figure saved to cd_figrue.png')
 
