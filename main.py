@@ -129,6 +129,87 @@ def outstanding_papers(pathObj):
 
 
 
+## 读取引用关系，所有引用关系必须在上述id的范围内,并且控制时间在2018年之前
+def read_ref_relations(pathObj):
+
+    ##目标ID列表
+    paper_year = json.loads(open(pathObj._field_paper_year_path).read())
+    ## 参考关系存放文件
+    ref_relation_file = open(pathObj._paper_ref_relation_path,'w')
+
+    sql = 'select paper_id,paper_reference_id from mag_core.paper_references'
+    cit_relations = []
+    citing_ids = []
+    query_op = dbop()
+    total_num = 0
+
+    progress = 0
+    pid_citnum = defaultdict(int)
+
+    pid_max_length = defaultdict(list)
+    for paper_id,paper_reference_id in query_op.query_database(sql):
+
+        progress+=1
+
+        if progress%100000000==0:
+            logging.info('progress {:}, {} ref realtions saved.'.format(progress,total_num))
+
+        if int(paper_year.get(paper_reference_id,9999))<1970 or int(paper_year.get(paper_reference_id,9999))>2017:
+
+            continue
+
+        else:
+
+            citing_ids.append(paper_id)
+
+            cit_relation = '{},{}'.format(paper_id,paper_reference_id)
+            cit_relations.append(cit_relation)
+
+            pid_citnum[paper_reference_id]+=1
+
+            ## 每100万条存储一次
+            if len(cit_relations)%10000000==0:
+                ref_relation_file.write('\n'.join(cit_relations)+'\n')
+                total_num+=len(cit_relations)
+                cit_relations = []
+
+    if len(cit_relations)>0:
+        total_num+=len(cit_relations)
+        ref_relation_file.write('\n'.join(cit_relations)+'\n')
+
+    ref_relation_file.close()
+    logging.info('{} ref relations saved to {}'.format(total_num,pathObj._paper_ref_relation_path))
+
+    open(pathObj._paper_cit_num_dis_path,'w').write(json.dumps(pid_citnum))
+    logging.info('paper cit num saved to {}.'.format(pathObj._paper_cit_num_dis_path))
+
+    citing_ids = set(citing_ids)
+    open('data/citing_ids.txt'.format('\n'.join(citing_ids)))
+    logging.info('{} citing ids saved.'.format(len(citing_ids)))
+
+    query_op = dbop()
+    sql = 'select paper_id,year from mag_core.papers'
+    progress = 0
+    year_dis = defaultdict(int)
+    logging.info('starting to read paper years ...')
+    for paper_id,year in query_op.query_database(sql):
+
+        progress+=1
+
+        if progress%10000000==0:
+            logging.info('Read paper year， progress {}, {} paper has year ...'.format(progress,len(paper_year)))
+
+        if paper_id in citing_ids and paper_year.get(paper_id,None) is None:
+
+            paper_year[paper_id] = int(year)
+
+            year_dis[int(year)]+=1
+
+    logging.info('Done, {}/{} paper has year ...'.format(len(paper_year),len(paper_ids)))
+    open(pathObj._field_paper_year_path,'w').write(json.dumps(paper_year))
+    logging.info('Data saved to data/mag_{}_paper_year.json'.format(pathObj._field_paper_year_path))
+
+
 if __name__ == '__main__':
 
     field_name = 'computer science'
@@ -136,5 +217,7 @@ if __name__ == '__main__':
 
     pathObj = PATH(field_name,tag)
 
-    outstanding_papers(pathObj)
+    read_ref_relations(pathObj)
+    # outstanding_papers(pathObj)
+
 
