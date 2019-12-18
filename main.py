@@ -97,13 +97,13 @@ def outstanding_papers(pathObj):
     logging.info('fig saved to fig/outstanding_papers.png.')
 
     #将这些ID的plot全画出来
-    row = len(selected_ids)/10+1
+    row = 6
 
-    fig,axes = plt.subplots(row,10,figsize=(10*5,row*4))
+    fig,axes = plt.subplots(row,5,figsize=(5*5,row*4))
 
-    for i,pid in enumerate(selected_ids):
+    for i,pid in enumerate(selected_ids[:30]):
 
-        ax = axes[i/10,i%10]
+        ax = axes[i/5,i%5]
 
         year_citnum = pid_year_citnum[pid]
 
