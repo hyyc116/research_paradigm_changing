@@ -51,6 +51,10 @@ def outstanding_papers(pathObj):
     xs = []
     ys  = []
 
+
+    ## 记录
+    selected_ids = []
+
     for pid in highly_cited_pids:
 
         pub_year = int(pid_year[pid])
@@ -60,12 +64,14 @@ def outstanding_papers(pathObj):
         total_in_5 = 0
         for year in sorted(year_citnum.keys(),key= lambda x:int(x)):
 
-            if int(year)- pub_year>3:
+            if int(year)- pub_year>5:
                 break
 
             total_in_5 += year_citnum[year]
 
         if total_in_5 > max_min:
+
+            selected_ids.append(pid)
 
             xs.append(pub_year)
             ys.append(total_in_5)
@@ -89,6 +95,37 @@ def outstanding_papers(pathObj):
     plt.savefig('fig/outstanding_papers.png',dpi=400)
 
     logging.info('fig saved to fig/outstanding_papers.png.')
+
+    #将这些ID的plot全画出来
+    row = len(selected_ids)/10+1
+
+    fig,axes = plt.subplots(row,10,figsize=(10*5,row*4))
+
+    for i,pid in enumerate(selected_ids):
+
+        ax = axes[i/10,i%10]
+
+        year_citnum = pid_year_citnum[pid]
+
+        xs = []
+        ys = []
+
+        for year in sorted(year_citnum.keys(),key= lambda x:int(x)):
+            citnum = int(year_citnum[year])
+
+            xs.append(int(year))
+            ys.append(int(citnum))
+
+        ax.plot(xs,ys)
+
+        ax.set_xlabel('year')
+        ax.set_ylabel('number of citations')
+
+    plt.tight_layout()
+
+    plt.savefig('fig/cd_figure.png',dpi=400)
+
+    logging.info('figure saved to cd_figrue.png')
 
 
 
